@@ -1,0 +1,17 @@
+{
+  "version": "test_v1",
+  "trained_at": "2026-03-19T09:39:20.312335+00:00",
+  "timeframe": "5M",
+  "symbols": [
+    "EURUSD"
+  ],
+  "feature_columns": [
+    "ret_1",
+    "ret_3",
+    "ret_12",
+    "volatility_12",
+    "range_norm",
+    "body_norm",
+    "volume_z"
+  ]
+}

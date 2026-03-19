@@ -1,0 +1,40 @@
+{
+  "version": "test_v1",
+  "rows": 580,
+  "train_rows": 464,
+  "val_rows": 116,
+  "symbols": [
+    "EURUSD"
+  ],
+  "timeframe": "5M",
+  "lookback_days": 365,
+  "feature_columns": [
+    "ret_1",
+    "ret_3",
+    "ret_12",
+    "volatility_12",
+    "range_norm",
+    "body_norm",
+    "volume_z"
+  ],
+  "metrics": {
+    "xgb": {
+      "precision": 0.5,
+      "recall": 1.0,
+      "accuracy": 0.5,
+      "f1": 0.666667
+    },
+    "lstm": {
+      "precision": 0.5,
+      "recall": 1.0,
+      "accuracy": 0.5,
+      "f1": 0.666667
+    },
+    "meta": {
+      "precision": 0.5,
+      "recall": 1.0,
+      "accuracy": 0.5,
+      "f1": 0.666667
+    }
+  }
+}

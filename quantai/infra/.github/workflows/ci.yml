@@ -1,0 +1,55 @@
+name: QuantAI CI/CD
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  backend-test:
+    runs-on: ubuntu-latest
+    services:
+      redis:
+        image: redis:7
+        ports: ["6379:6379"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11"}
+      - run: pip install -r quantai/backend/requirements.txt
+      - run: pytest quantai/backend/tests/ -v --tb=short --cov=quantai/backend/app --cov-report=xml
+        env:
+          DATABASE_URL: "sqlite+aiosqlite:///./test.db"
+          REDIS_URL: "redis://localhost:6379"
+          SECRET_KEY: "test-secret-key-32-chars-minimum"
+          TELEGRAM_BOT_TOKEN: "fake:token"
+          TELEGRAM_ALLOWED_CHAT_IDS: "[123456]"
+          TELEGRAM_ADMIN_CHAT_ID: "123456"
+
+  web-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: "20"}
+      - run: cd quantai/web && npm ci && npm run build && npm run type-check
+
+  flutter-analyze:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with: {flutter-version: "3.22.0", channel: "stable"}
+      - run: cd quantai/mobile && flutter pub get
+      - run: cd quantai/mobile && flutter analyze --no-fatal-infos
+      - run: cd quantai/mobile && flutter test
+
+  docker-build:
+    runs-on: ubuntu-latest
+    needs: [backend-test]
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -f quantai/infra/Dockerfile -t quantai-backend:latest .
+      - run: docker build -f quantai/infra/Dockerfile.worker -t quantai-worker:latest .
